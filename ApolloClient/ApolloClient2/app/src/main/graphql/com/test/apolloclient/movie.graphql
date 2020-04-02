@@ -1,8 +1,0 @@
-query Movies {
-  movies {
-      id
-      original_title
-      poster_path
-      vote_average
-  }
-}
