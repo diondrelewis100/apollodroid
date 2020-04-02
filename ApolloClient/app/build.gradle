@@ -8,27 +8,27 @@ apply plugin: 'com.apollographql.apollo'
 
 apply plugin: 'kotlin-kapt'
 
+
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.test.apolloclient"
         minSdkVersion 15
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            testCoverageEnabled = true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
-//    testOptions {
-//        unitTests.returnDefaultValues = true
-//    }
 
     dataBinding {
         enabled = true
@@ -37,6 +37,7 @@ android {
     apollo {
         generateKotlinModels.set(true) // or false for Java models
     }
+
 }
 
 dependencies {
@@ -54,11 +55,18 @@ dependencies {
     implementation 'jp.wasabeef:picasso-transformations:2.2.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
 
     testImplementation 'android.arch.core:core-testing:1.0.0-alpha3'
 
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:1.9.5"
+    testImplementation 'org.json:json:20140107'
 
     compileOnly("org.jetbrains:annotations:13.0")
     testCompileOnly("org.jetbrains:annotations:13.0")
 }
+

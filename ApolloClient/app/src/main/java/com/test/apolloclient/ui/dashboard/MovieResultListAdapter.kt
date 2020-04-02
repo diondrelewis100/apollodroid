@@ -1,4 +1,4 @@
-package com.vishion.app.ui.productresult
+package com.test.app.ui.productresult
 
 import android.content.Context
 import android.view.LayoutInflater

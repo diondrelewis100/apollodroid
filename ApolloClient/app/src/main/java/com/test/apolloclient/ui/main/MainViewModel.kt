@@ -4,14 +4,18 @@ import androidx.databinding.BaseObservable
 import androidx.databinding.Bindable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.test.apolloclient.helpers.Validations
+import com.test.apolloclient.helpers.HttpHelper
+import com.test.apolloclient.helpers.Validator
+import okhttp3.*
+import org.json.JSONObject
+import java.io.IOException
 
 class MainViewModel : BaseObservable() {
 
     // controller interface to inform UI
     interface SignInController {
         fun onSubmit()
-        fun onLogin()
+        fun onLogin(token: String)
         fun onFailedLogin(err: String)
     }
 
@@ -56,7 +60,7 @@ class MainViewModel : BaseObservable() {
     // method called when user clicks sign in button
     // business logic to validate email and password and performs login
     fun btnSubmitPressed() {
-        if (!Validations.validateEmail(email)) {
+        if (!Validator().validateEmail(email)) {
             _emailError.value = true
         } else if (password.isEmpty()) {
             _emailError.value = false
@@ -71,13 +75,43 @@ class MainViewModel : BaseObservable() {
 
     // performs login with dummy inline data
     fun doLogin() {
-        // TODO: auth can also be done with ApolloServer
-        if (email == "diondre@ibgtraining.com" && password == "123456") {
-            // updates UI via controller if login is successful
-            controller.onLogin()
-        } else {
-            // updates UI via controller if login is failed
-            controller.onFailedLogin("Invalid username or password")
-        }
+
+        val httpHelper = HttpHelper()
+        val httpClient = httpHelper.getHttpClient()
+
+        // val json: = "{\"username\":${email},\"password\":\"${password}\"}"
+
+        val reqBody = JSONObject()
+        reqBody.put("username", email)
+        reqBody.put("password", password)
+
+        val requestBody = RequestBody.create(
+            MediaType.parse("application/json"),
+            reqBody.toString()
+        )
+
+        val request = Request.Builder()
+            .url(httpHelper.AUTH_ENDPOINT)
+            .post(requestBody)
+            .build()
+
+        val call: Call = httpClient.newCall(request)
+        call.enqueue(object: Callback {
+            override fun onResponse(call: Call, response: Response) {
+                val strResponse: String? = response.body()?.string()
+
+                val responseJson = JSONObject(strResponse)
+                if (response.code() == 200) {
+                    controller.onLogin(responseJson.getString("token"))
+                } else {
+                    val errMsg = responseJson.getString("error")
+                    controller.onFailedLogin(errMsg)
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                controller.onFailedLogin("Invalid username or password")
+            }
+        })
     }
 }

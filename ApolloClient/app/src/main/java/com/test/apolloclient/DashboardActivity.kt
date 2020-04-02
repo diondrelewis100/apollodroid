@@ -11,8 +11,12 @@ import com.test.apolloclient.ui.dashboard.DashboardFragment
 
 class DashboardActivity : AppCompatActivity() {
 
+    var token: String = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        token = intent.extras.getString("token")
 
         // to allow app to make plain http calls instead of https
         if (Build.VERSION.SDK_INT > 9) {

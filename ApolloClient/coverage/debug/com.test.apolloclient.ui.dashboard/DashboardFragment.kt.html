@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DashboardFragment.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debugAndroidTest</a> &gt; <a href="index.source.html" class="el_package">com.test.apolloclient.ui.dashboard</a> &gt; <span class="el_source">DashboardFragment.kt</span></div><h1>DashboardFragment.kt</h1><pre class="source lang-java linenums">package com.test.apolloclient.ui.dashboard
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
+import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.test.apolloclient.DashboardActivity
+import com.test.apolloclient.MoviesQuery
+import com.test.apolloclient.R
+import com.test.apolloclient.databinding.DashboardFragmentBinding
+import com.test.app.ui.productresult.MovieResultListAdapter
+import com.test.app.ui.productresult.OnListFragmentInteractionListener
+import kotlinx.android.synthetic.main.dashboard_fragment.*
+
+
+<span class="fc" id="L22">class DashboardFragment : Fragment(), DashboardViewModel.DashboardController,</span>
+    OnListFragmentInteractionListener {
+
+<span class="fc" id="L25">    companion object {</span>
+        // the fragment instantiator
+<span class="fc" id="L27">        fun newInstance() = DashboardFragment()</span>
+    }
+
+    private lateinit var viewModel: DashboardViewModel
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        // inflat layout DataBindingUtil
+<span class="fc" id="L37">        val binding: DashboardFragmentBinding = DataBindingUtil.inflate(inflater, R.layout.dashboard_fragment, container, false)</span>
+<span class="fc" id="L38">        viewModel = DashboardViewModel()</span>
+        // assign this fragment as controller to handle UI actions from view model
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        viewModel.controller = this</span>
+<span class="pc bpc" id="L41" title="1 of 2 branches missed.">        binding.dashboardModel = viewModel</span>
+        // required to specify current fragment as lifecycle owner
+<span class="fc" id="L43">        binding.lifecycleOwner = this</span>
+        // provide root view from data binding
+<span class="fc" id="L45">        return binding.root</span>
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+<span class="fc" id="L49">        super.onActivityCreated(savedInstanceState)</span>
+
+        // setting linear single column list layout
+<span class="fc" id="L52">        lstMovies.layoutManager = LinearLayoutManager(activity)</span>
+
+        // get user token from activity
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        val token = (activity as DashboardActivity).token</span>
+
+        // fetch popular movies from apollo graphql server
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        viewModel.fetchPopularMovies(token)</span>
+<span class="fc" id="L59">    }</span>
+
+    override fun onReceivedMovies(movies: List&lt;MoviesQuery.Movie?&gt;) {
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        activity?.runOnUiThread {</span>
+            // create and assign adapter to recycler view
+<span class="fc" id="L64">            val adapter = MovieResultListAdapter(movies, this)</span>
+
+<span class="pc bpc" id="L66" title="1 of 2 branches missed.">            if (lstMovies != null)</span>
+<span class="fc" id="L67">                lstMovies.adapter = adapter</span>
+<span class="fc" id="L68">        }</span>
+<span class="fc" id="L69">    }</span>
+
+    override fun onReceiveMoviesFailed(err: String) {
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        activity?.runOnUiThread {</span>
+            // show alert dialog
+            AlertDialog
+<span class="nc bnc" id="L75" title="All 2 branches missed.">            .Builder(activity!!)</span>
+<span class="nc" id="L76">            .setCancelable(false)</span>
+<span class="nc" id="L77">            .setMessage(err)</span>
+<span class="nc" id="L78">            .setNegativeButton(&quot;OK&quot;, null)</span>
+<span class="nc" id="L79">            .create()</span>
+<span class="nc" id="L80">            .show()</span>
+<span class="nc" id="L81">        }</span>
+<span class="nc" id="L82">    }</span>
+
+    override fun onListFragmentInteraction(item: MoviesQuery.Movie?) {
+        // movie item is optional value. Verify not null and show movie review page in native browser
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">        item?.let {</span>
+<span class="fc" id="L87">            val id = it.id</span>
+<span class="fc" id="L88">            val browserIntent =</span>
+<span class="fc" id="L89">                Intent(Intent.ACTION_VIEW, Uri.parse(&quot;https://www.themoviedb.org/movie/$id?language=en-US&quot;))</span>
+<span class="fc" id="L90">            startActivity(browserIntent)</span>
+<span class="fc" id="L91">        }</span>
+<span class="fc" id="L92">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.7.9.201702052155</span>Generated by the Android Gradle plugin 3.5.3</div></body></html>

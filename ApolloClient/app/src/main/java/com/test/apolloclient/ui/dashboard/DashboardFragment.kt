@@ -10,11 +10,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.test.apolloclient.DashboardActivity
 import com.test.apolloclient.MoviesQuery
 import com.test.apolloclient.R
 import com.test.apolloclient.databinding.DashboardFragmentBinding
-import com.vishion.app.ui.productresult.MovieResultListAdapter
-import com.vishion.app.ui.productresult.OnListFragmentInteractionListener
+import com.test.app.ui.productresult.MovieResultListAdapter
+import com.test.app.ui.productresult.OnListFragmentInteractionListener
 import kotlinx.android.synthetic.main.dashboard_fragment.*
 
 
@@ -50,27 +51,34 @@ class DashboardFragment : Fragment(), DashboardViewModel.DashboardController,
         // setting linear single column list layout
         lstMovies.layoutManager = LinearLayoutManager(activity)
 
+        // get user token from activity
+        val token = (activity as DashboardActivity).token
+
         // fetch popular movies from apollo graphql server
-        viewModel.fetchPopularMovies()
+        viewModel.fetchPopularMovies(token)
     }
 
     override fun onReceivedMovies(movies: List<MoviesQuery.Movie?>) {
-        // create and assign adapter to recycler view
-        val adapter = MovieResultListAdapter(movies, this)
         activity?.runOnUiThread {
-            lstMovies.adapter = adapter
+            // create and assign adapter to recycler view
+            val adapter = MovieResultListAdapter(movies, this)
+
+            if (lstMovies != null)
+                lstMovies.adapter = adapter
         }
     }
 
     override fun onReceiveMoviesFailed(err: String) {
-        // show alert dialog
-        AlertDialog
-        .Builder(activity!!)
-        .setCancelable(false)
-        .setMessage(err)
-        .setNegativeButton("OK", null)
-        .create()
-        .show()
+        activity?.runOnUiThread {
+            // show alert dialog
+            AlertDialog
+            .Builder(activity!!)
+            .setCancelable(false)
+            .setMessage(err)
+            .setNegativeButton("OK", null)
+            .create()
+            .show()
+        }
     }
 
     override fun onListFragmentInteraction(item: MoviesQuery.Movie?) {

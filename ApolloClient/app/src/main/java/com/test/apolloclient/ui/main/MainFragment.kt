@@ -37,22 +37,25 @@ class MainFragment : Fragment(), MainViewModel.SignInController {
 
     override fun onSubmit() {}
 
-    override fun onLogin() {
+    override fun onLogin(token: String) {
         // login successful, show dashboard screen and clear the stack
         val intent = Intent(activity, DashboardActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intent.putExtra("token", token)
         activity?.startActivity(intent)
     }
 
     override fun onFailedLogin(err: String) {
-        // show alert dialog
-        AlertDialog
-            .Builder(activity!!)
-            .setCancelable(false)
-            .setMessage(err)
-            .setNegativeButton("OK", null)
-            .create()
-            .show()
+        activity?.runOnUiThread {
+            // show alert dialog
+            AlertDialog
+                .Builder(activity!!)
+                .setCancelable(false)
+                .setMessage(err)
+                .setNegativeButton("OK", null)
+                .create()
+                .show()
+        }
     }
 
 }
